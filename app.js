@@ -144,14 +144,38 @@ function routePointsForRequest(){
 
 async function requestBrouter(coords,bikeType=$('#bikeType').value){
   const cfg=BIKE[bikeType]||BIKE.trekking;let last=null;
+  const encodeProfileValue=v=>typeof v==='boolean'?(v?'1':'0'):String(v);
   for(const profile of cfg.profiles){
-    try{
-      const params=new URLSearchParams({lonlats:coords.map(c=>`${c[0]},${c[1]}`).join('|'),profile,alternativeidx:'0',format:'geojson',timode:'3'});
-      const extras=profileParams(profile);for(const [k,v] of Object.entries(extras))params.set(`profile:${k}`,String(v));
-      const r=await fetch(`${APP.endpoints.brouter}?${params}`);if(!r.ok)throw new Error(`Routing-Server: HTTP ${r.status}`);
-      const data=await r.json();const f=data.features?.find(x=>x.geometry?.type==='LineString');if(!f)throw new Error('Keine fahrbare Route gefunden.');
-      return {feature:f,profile};
-    }catch(e){last=e;console.warn('BRouter profile failed',profile,e);}
+    const attempts=[true,false]; // erst mit Optionen, bei Serverfehler nochmals mit Standardprofil
+    for(const withExtras of attempts){
+      try{
+        const params=new URLSearchParams({
+          lonlats:coords.map(c=>`${c[0]},${c[1]}`).join('|'),
+          profile,
+          alternativeidx:'0',
+          format:'geojson',
+          timode:'3'
+        });
+        if(withExtras){
+          const extras=profileParams(profile);
+          for(const [k,v] of Object.entries(extras))params.set(`profile:${k}`,encodeProfileValue(v));
+        }
+        const r=await fetch(`${APP.endpoints.brouter}?${params}`);
+        if(!r.ok){
+          let detail='';
+          try{detail=(await r.text()).trim().slice(0,180);}catch{}
+          throw new Error(`Routing-Server: HTTP ${r.status}${detail?` – ${detail}`:''}`);
+        }
+        const data=await r.json();
+        const f=data.features?.find(x=>x.geometry?.type==='LineString');
+        if(!f)throw new Error('Keine fahrbare Route gefunden.');
+        if(!withExtras)toast('Route berechnet. Einige Routenoptionen konnten vom öffentlichen Server nicht übernommen werden.',4200);
+        return {feature:f,profile};
+      }catch(e){
+        last=e;
+        console.warn('BRouter request failed',profile,withExtras?'mit Optionen':'Standardprofil',e);
+      }
+    }
   }
   throw last||new Error('Route konnte nicht berechnet werden.');
 }

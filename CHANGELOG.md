@@ -17,3 +17,9 @@
 - Responsive Hoch- und Querformat-Darstellung.
 - PWA-Unterstützung.
 - Lokaler Aufrufzähler ohne externen Trackingdienst.
+## 2.0.1 – Routing-Fix
+- BRouter-Profilparameter werden jetzt als 0/1 statt true/false gesendet.
+- Bei Serverfehlern wird automatisch ein zweiter Versuch mit dem Standardprofil gestartet.
+- Fehlermeldungen des Routing-Servers werden besser angezeigt.
+- PWA-Cache angehoben, damit der Routing-Fix sofort geladen wird.
+
