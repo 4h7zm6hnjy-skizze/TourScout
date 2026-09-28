@@ -1,14 +1,15 @@
 {
-  "name":"TourScout – Radnavigation & Ausflüge",
+  "name":"TourScout – Fahrradnavigation & Ausflüge",
   "short_name":"TourScout",
-  "description":"Kostenfreie Fahrrad-Routenplanung, Navigation, Ausflugsfinder, Camping und E-Bike-Ladepunkte.",
+  "description":"Fahrradrouten, Sprachnavigation, Ausflugsfinder, Camping und E-Bike-Ladepunkte.",
   "start_url":"./",
+  "scope":"./",
   "display":"standalone",
-  "background_color":"#f5f7f6",
-  "theme_color":"#1f7a57",
   "orientation":"any",
+  "background_color":"#f6f8f5",
+  "theme_color":"#2d7c5a",
   "icons":[
-    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png"},
-    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png"}
+    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ]
 }

@@ -1,92 +1,169 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#1f7a57" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>TourScout – Radnavigation & Ausflüge</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-  <link href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#2d7c5a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="TourScout">
+  <meta name="description" content="Kostenlose Fahrradnavigation, Tourenplanung, Ausflugsfinder, Camping- und E-Bike-Ladepunkte.">
+  <title>TourScout – Fahrradnavigation & Ausflüge</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://tiles.openfreemap.org">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="appShell">
-    <header class="topbar">
-      <button class="iconButton mobileOnly" id="menuBtn" aria-label="Menü">☰</button>
-      <div class="brand">
-        <div class="brandMark">TS</div>
-        <div><strong>TourScout</strong><small>Radnavigation & Ausflüge</small></div>
-      </div>
-      <div class="topActions">
-        <button class="iconButton" id="themeBtn" aria-label="Darstellung">◐</button>
-        <button class="iconButton" id="locateBtn" aria-label="Mein Standort">◎</button>
-      </div>
-    </header>
+<div id="appShell">
+  <header class="topbar">
+    <button class="iconButton onlyMobile" id="menuBtn" aria-label="Menü öffnen">☰</button>
+    <div class="brand">
+      <div class="brandMark">TS</div>
+      <div class="brandText"><strong>TourScout</strong><small>Radnavigation & Ausflüge</small></div>
+    </div>
+    <div class="topActions">
+      <button class="iconButton" id="themeBtn" aria-label="Hell- oder Dunkelmodus">◐</button>
+      <button class="iconButton" id="locateBtn" aria-label="Meinen Standort anzeigen">◎</button>
+    </div>
+  </header>
 
-    <aside id="sidebar" class="sidebar">
-      <nav class="mainNav" aria-label="Hauptnavigation">
-        <button class="navItem active" data-panel="routePanel"><span>🚲</span> Route</button>
-        <button class="navItem" data-panel="discoverPanel"><span>🎯</span> Ausflüge</button>
-        <button class="navItem" data-panel="bikepackingPanel"><span>🏕️</span> Bikepacking</button>
-        <button class="navItem" data-panel="savedPanel"><span>⭐</span> Gespeichert</button>
-      </nav>
+  <aside id="sidebar" class="sidebar" aria-label="TourScout Bedienfeld">
+    <nav class="mainNav" aria-label="Hauptnavigation">
+      <button class="navItem active" data-panel="routePanel"><span>🚲</span><b>Navigation</b></button>
+      <button class="navItem" data-panel="discoverPanel"><span>🎯</span><b>Ausflüge</b></button>
+      <button class="navItem" data-panel="tourPanel"><span>🏕️</span><b>Touren</b></button>
+      <button class="navItem" data-panel="savedPanel"><span>⭐</span><b>Gespeichert</b></button>
+    </nav>
 
+    <div class="panelScroller">
       <section id="routePanel" class="panel activePanel">
-        <div class="sectionTitle"><div><h2>Radtour planen</h2><p>Start, Ziel und Zwischenpunkte</p></div></div>
-
-        <label class="fieldLabel" for="bikeType">Fahrradart</label>
-        <select id="bikeType" class="field">
-          <option value="ebike">E-Bike</option>
-          <option value="emtb">E-MTB</option>
-          <option value="trekking" selected>Trekkingrad</option>
-          <option value="gravel">Gravel</option>
-          <option value="mtb">Mountainbike</option>
-          <option value="road">Rennrad</option>
-          <option value="city">Citybike</option>
-        </select>
-
-        <div class="waypointBox">
-          <div class="waypointRow"><span class="dot startDot"></span><input id="startInput" class="field" placeholder="Start suchen oder Karte antippen" autocomplete="off"><button class="smallButton" data-point="start">Karte</button></div>
-          <div id="viaList"></div>
-          <div class="waypointRow"><span class="dot endDot"></span><input id="endInput" class="field" placeholder="Ziel suchen oder Karte antippen" autocomplete="off"><button class="smallButton" data-point="end">Karte</button></div>
+        <div class="sectionHead">
+          <div><h2>Radtour planen</h2><p>Von A nach B oder als Rundtour</p></div>
+          <button class="textButton" id="clearRouteBtn">Leeren</button>
         </div>
 
-        <div class="buttonRow">
-          <button id="addViaBtn" class="secondaryButton">＋ Zwischenpunkt</button>
-          <button id="swapBtn" class="secondaryButton">⇅ Tauschen</button>
+        <div class="grid2">
+          <label class="fieldGroup"><span>Fahrradart</span>
+            <select id="bikeType" class="field">
+              <option value="ebike">⚡ E-Bike</option>
+              <option value="emtb">⚡ E-MTB</option>
+              <option value="trekking" selected>🚲 Trekkingrad</option>
+              <option value="gravel">🟤 Gravel</option>
+              <option value="mtb">⛰️ Mountainbike</option>
+              <option value="road">🏁 Rennrad</option>
+              <option value="city">🏙️ Citybike</option>
+            </select>
+          </label>
+          <label class="fieldGroup"><span>Routing</span>
+            <select id="routeMode" class="field">
+              <option value="balanced" selected>Ausgewogen</option>
+              <option value="safe">Ruhig & sicher</option>
+              <option value="fast">Schneller</option>
+              <option value="flat">Wenig Steigung</option>
+              <option value="scenic">Natur & schön</option>
+            </select>
+          </label>
         </div>
 
-        <details class="options">
+        <div id="normalRouteBox">
+          <div class="waypointBox">
+            <div class="waypointRow">
+              <span class="dot startDot"></span>
+              <input id="startInput" class="field" placeholder="Startort" autocomplete="off">
+              <button class="smallButton" data-point="start">Karte</button>
+            </div>
+            <div id="viaList"></div>
+            <div class="waypointRow" id="endWaypointRow">
+              <span class="dot endDot"></span>
+              <input id="endInput" class="field" placeholder="Zielort" autocomplete="off">
+              <button class="smallButton" data-point="end">Karte</button>
+            </div>
+          </div>
+          <div class="buttonRow">
+            <button class="secondaryButton" id="startHereBtn">◎ Start = Standort</button>
+            <button class="secondaryButton" id="swapBtn">⇅ Tauschen</button>
+            <button class="secondaryButton" id="addViaBtn">＋ Zwischenpunkt</button>
+          </div>
+        </div>
+
+        <label class="switchRow prominent"><span><b>Rundtour</b><small>Start und Ziel identisch</small></span><input type="checkbox" id="roundTrip"><i></i></label>
+        <div id="roundTripBox" class="subCard hidden">
+          <div class="grid2">
+            <label class="fieldGroup"><span>Gewünschte Länge</span><div class="inputSuffix"><input id="roundKm" class="field" type="number" min="5" max="250" value="40"><em>km</em></div></label>
+            <label class="fieldGroup"><span>Richtung</span><select id="roundDirection" class="field"><option value="0">Norden</option><option value="45">Nordost</option><option value="90">Osten</option><option value="135">Südost</option><option value="180">Süden</option><option value="225">Südwest</option><option value="270">Westen</option><option value="315">Nordwest</option></select></label>
+          </div>
+          <p class="muted compact">TourScout setzt automatisch Zwischenpunkte und berechnet daraus eine Rundtour. Die tatsächliche Länge kann abweichen.</p>
+        </div>
+
+        <details class="options" open>
           <summary>Routenoptionen</summary>
-          <label class="switchRow"><span>Starke Steigungen meiden</span><input type="checkbox" id="avoidHills"><i></i></label>
           <label class="switchRow"><span>Unsichere Hauptstraßen meiden</span><input type="checkbox" id="avoidUnsafe" checked><i></i></label>
+          <label class="switchRow"><span>Starke Steigungen meiden</span><input type="checkbox" id="avoidHills"><i></i></label>
           <label class="switchRow"><span>Fähren vermeiden</span><input type="checkbox" id="avoidFerries"><i></i></label>
-          <label class="switchRow"><span>Camping anzeigen</span><input type="checkbox" id="showCamping" checked><i></i></label>
-          <label class="switchRow"><span>E-Bike-Laden anzeigen</span><input type="checkbox" id="showCharging" checked><i></i></label>
+          <label class="switchRow"><span>Automatisch neu berechnen</span><input type="checkbox" id="autoReroute" checked><i></i></label>
         </details>
 
-        <button id="planBtn" class="primaryButton">Route berechnen</button>
+        <details class="options" id="ebikeOptions">
+          <summary>E-Bike-Reichweite</summary>
+          <div class="grid3">
+            <label class="fieldGroup"><span>Akku</span><div class="inputSuffix"><input id="batteryWh" class="field" type="number" min="100" max="1500" value="625"><em>Wh</em></div></label>
+            <label class="fieldGroup"><span>Verbrauch</span><div class="inputSuffix"><input id="whPerKm" class="field" type="number" min="3" max="35" step="0.5" value="11"><em>Wh/km</em></div></label>
+            <label class="fieldGroup"><span>Reserve</span><div class="inputSuffix"><input id="batteryReserve" class="field" type="number" min="0" max="50" value="15"><em>%</em></div></label>
+          </div>
+          <div id="rangePreview" class="infoCard compact"></div>
+        </details>
+
+        <details class="options">
+          <summary>Camping & Laden entlang der Route</summary>
+          <label class="switchRow"><span>🏕️ Campingplätze anzeigen</span><input type="checkbox" id="showCamping" checked><i></i></label>
+          <label class="switchRow"><span>🔌 E-Bike-Ladepunkte anzeigen</span><input type="checkbox" id="showCharging" checked><i></i></label>
+          <label class="fieldGroup"><span>Maximaler Umweg</span><select id="poiCorridor" class="field"><option value="1000">1 km</option><option value="3000" selected>3 km</option><option value="5000">5 km</option><option value="10000">10 km</option></select></label>
+        </details>
+
+        <button id="planBtn" class="primaryButton big">Route berechnen</button>
         <div id="routeStatus" class="status muted">Noch keine Route berechnet.</div>
 
-        <div id="routeSummary" class="summaryGrid hidden">
-          <div><strong id="sumDistance">–</strong><small>Distanz</small></div>
-          <div><strong id="sumTime">–</strong><small>Fahrzeit</small></div>
-          <div><strong id="sumAscent">–</strong><small>Anstieg</small></div>
-          <div><strong id="sumStops">–</strong><small>Stopps</small></div>
-        </div>
+        <div id="routeSummary" class="hidden">
+          <div class="summaryGrid">
+            <div><strong id="sumDistance">–</strong><small>Distanz</small></div>
+            <div><strong id="sumTime">–</strong><small>Fahrzeit</small></div>
+            <div><strong id="sumAscent">–</strong><small>Anstieg</small></div>
+            <div><strong id="sumRange">–</strong><small>Akku</small></div>
+          </div>
+          <div id="rangeWarning" class="rangeBar hidden"><span></span><b></b></div>
 
-        <div class="buttonRow hidden" id="routeActions">
-          <button id="startNavBtn" class="primaryButton grow">Navigation starten</button>
-          <button id="gpxBtn" class="secondaryButton">GPX</button>
+          <div class="chartCard">
+            <div class="cardTitle"><strong>Höhenprofil</strong><small id="elevationMeta">–</small></div>
+            <svg id="elevationChart" viewBox="0 0 500 120" preserveAspectRatio="none" aria-label="Höhenprofil"></svg>
+          </div>
+
+          <div class="chartCard">
+            <div class="cardTitle"><strong>Streckenart</strong><small>aus BRouter/OSM-Tags</small></div>
+            <div id="surfaceStats" class="statBars"></div>
+          </div>
+
+          <div class="buttonGrid">
+            <button id="startNavBtn" class="primaryButton">▶ Navigation</button>
+            <button id="saveRouteBtn" class="secondaryButton">⭐ Tour speichern</button>
+            <button id="gpxBtn" class="secondaryButton">⬇ GPX</button>
+            <label class="secondaryButton fileButton">⬆ GPX importieren<input id="gpxImport" type="file" accept=".gpx,application/gpx+xml"></label>
+            <button id="shareRouteBtn" class="secondaryButton">↗ Teilen</button>
+            <button id="qrRouteBtn" class="secondaryButton">▦ QR-Code</button>
+          </div>
         </div>
       </section>
 
       <section id="discoverPanel" class="panel">
-        <div class="sectionTitle"><div><h2>Ausflugsfinder</h2><p>Ziele im gewünschten Radius</p></div></div>
+        <div class="sectionHead"><div><h2>Ausflugsfinder</h2><p>D-A-CH · NL · BE · PL · CZ</p></div></div>
+        <div class="searchRow">
+          <input id="discoverCenter" class="field" placeholder="Ort für die Suche, z. B. Hörstel">
+          <button class="smallButton" id="discoverCenterBtn">Suchen</button>
+          <button class="smallButton" id="discoverHereBtn">◎</button>
+        </div>
+        <div id="discoverCenterLabel" class="muted compact">Suchzentrum: Kartenmitte oder Standort</div>
 
         <label class="fieldLabel">Wetter</label>
         <div class="segmented" id="weatherSegment">
@@ -95,80 +172,121 @@
           <button data-weather="all">🌤️ Egal</button>
         </div>
 
+        <label class="fieldLabel">Für wen?</label>
+        <div class="segmented" id="audienceSegment">
+          <button data-audience="all" class="active">Alle</button>
+          <button data-audience="family">Familie</button>
+          <button data-audience="kids">Kinder</button>
+        </div>
+
         <label class="fieldLabel" for="radius">Radius: <strong><span id="radiusValue">25</span> km</strong></label>
-        <input id="radius" type="range" min="5" max="200" value="25" step="5">
+        <input id="radius" class="range" type="range" min="5" max="200" value="25" step="5">
 
         <label class="fieldLabel">Kategorien</label>
         <div class="chips" id="categoryChips">
           <button data-cat="nature" class="active">🌲 Natur</button>
-          <button data-cat="sights" class="active">🏰 Sehenswürdigkeiten</button>
-          <button data-cat="family">👨‍👩‍👧 Familie</button>
-          <button data-cat="museum">🏛️ Museum</button>
+          <button data-cat="sights" class="active">🏰 Burgen & Ziele</button>
+          <button data-cat="animals">🦁 Tiere</button>
+          <button data-cat="family">🎢 Freizeit</button>
           <button data-cat="water">💧 Wasser</button>
           <button data-cat="view">📷 Aussicht</button>
+          <button data-cat="museum" class="active">🏛️ Museum</button>
+          <button data-cat="indoor">🏠 Indoor</button>
+          <button data-cat="sport">🎳 Sport</button>
+          <button data-cat="tech">⚙️ Technik</button>
         </div>
 
         <label class="switchRow"><span>Nur fahrradfreundliche Ziele</span><input type="checkbox" id="bikeFriendly"><i></i></label>
-        <button id="discoverBtn" class="primaryButton">Ausflüge suchen</button>
-        <div id="discoverStatus" class="status muted">Die Suche nutzt die Kartenmitte oder deinen Standort.</div>
+        <label class="switchRow"><span>Nur als kostenlos markiert</span><input type="checkbox" id="freeOnly"><i></i></label>
+        <button id="discoverBtn" class="primaryButton big">Ausflüge suchen</button>
+        <div id="discoverStatus" class="status muted">Wähle Filter und starte die Suche.</div>
         <div id="poiResults" class="resultList"></div>
       </section>
 
-      <section id="bikepackingPanel" class="panel">
-        <div class="sectionTitle"><div><h2>Bikepacking</h2><p>Mehrtagestouren vorbereiten</p></div></div>
-        <label class="fieldLabel">Tage</label><input id="days" class="field" type="number" min="2" max="30" value="3">
-        <label class="fieldLabel">Kilometer pro Tag</label><input id="dailyKm" class="field" type="number" min="20" max="250" step="5" value="70">
-        <label class="switchRow"><span>Camping am Etappenziel</span><input type="checkbox" checked><i></i></label>
-        <label class="switchRow"><span>E-Bike-Laden berücksichtigen</span><input type="checkbox" checked id="packingCharge"><i></i></label>
-        <div class="infoCard">Plane zuerst eine Route. TourScout teilt sie anschließend in Tagesetappen und zeigt Camping- sowie Ladeoptionen entlang der Strecke.</div>
-        <button id="buildStagesBtn" class="primaryButton">Etappen erstellen</button>
+      <section id="tourPanel" class="panel">
+        <div class="sectionHead"><div><h2>Bikepacking & Mehrtagestour</h2><p>Etappen, Camping und Ladeoptionen</p></div></div>
+        <div class="infoCard">Plane zuerst unter <b>Navigation</b> eine Route. Danach teilt TourScout sie in Tagesetappen.</div>
+        <div class="grid2">
+          <label class="fieldGroup"><span>Planung nach</span><select id="stageMode" class="field"><option value="days">Anzahl Tage</option><option value="km">Kilometer pro Tag</option></select></label>
+          <label class="fieldGroup" id="daysGroup"><span>Tage</span><input id="days" class="field" type="number" min="2" max="21" value="3"></label>
+          <label class="fieldGroup hidden" id="dailyKmGroup"><span>km pro Tag</span><input id="dailyKm" class="field" type="number" min="20" max="250" step="5" value="70"></label>
+        </div>
+        <label class="switchRow"><span>🏕️ Camping am Etappenziel suchen</span><input type="checkbox" id="packingCamp" checked><i></i></label>
+        <label class="switchRow"><span>🔌 E-Bike-Laden am Etappenziel suchen</span><input type="checkbox" id="packingCharge" checked><i></i></label>
+        <label class="fieldGroup"><span>Suchradius am Etappenziel</span><select id="stageRadius" class="field"><option value="3000">3 km</option><option value="5000" selected>5 km</option><option value="8000">8 km</option><option value="12000">12 km</option></select></label>
+        <button id="buildStagesBtn" class="primaryButton big">Etappen erstellen</button>
+        <div id="stageStatus" class="status muted"></div>
         <div id="stageResults" class="resultList"></div>
       </section>
 
       <section id="savedPanel" class="panel">
-        <div class="sectionTitle"><div><h2>Gespeichert</h2><p>Favoriten und Touren</p></div></div>
-        <div class="infoCard">Favoriten werden in diesem Prototyp lokal auf deinem Gerät gespeichert.</div>
+        <div class="sectionHead"><div><h2>Gespeichert</h2><p>Touren, Favoriten und besuchte Orte</p></div></div>
+        <div class="segmented" id="savedTabs">
+          <button data-saved="routes" class="active">Touren</button>
+          <button data-saved="favorites">Favoriten</button>
+          <button data-saved="visited">Besucht</button>
+        </div>
+        <div class="infoCard compact">Die gespeicherten Daten liegen lokal auf diesem Gerät. Es wird kein Benutzerkonto benötigt.</div>
         <div id="savedResults" class="resultList"></div>
       </section>
+    </div>
 
-      <footer class="sideFooter">
-        <div><strong id="visitCount">0</strong> <span>Aufrufe auf diesem Gerät</span></div>
-        <small>Karte: © OpenStreetMap-Mitwirkende · Darstellung: OpenFreeMap</small>
-      </footer>
-    </aside>
+    <footer class="sideFooter">
+      <div class="counterRow"><span>👁️ Aufrufe auf diesem Gerät</span><strong id="globalVisitCount">0</strong></div>
+      <small id="counterNote">Der Zähler bleibt vollständig lokal und benötigt keinen externen Trackingdienst.</small>
+      <small>Karte: © OpenStreetMap-Mitwirkende · Darstellung: OpenFreeMap · Routing: BRouter</small>
+      <button id="aboutBtn" class="textButton footerLink">Über & Lizenzen</button>
+    </footer>
+  </aside>
 
-    <main class="mapArea">
-      <div id="map"></div>
-      <div class="mapToolbar">
-        <button id="campBtn" class="mapPill active">🏕️ Camping</button>
-        <button id="chargeBtn" class="mapPill active">🔌 E-Bike laden</button>
-      </div>
-      <div id="clickHint" class="clickHint hidden">Tippe auf die Karte … <button id="cancelPick">Abbrechen</button></div>
-    </main>
+  <main class="mapArea">
+    <div id="map"></div>
+    <div class="mapToolbar">
+      <button id="campBtn" class="mapPill active">🏕️ Camping</button>
+      <button id="chargeBtn" class="mapPill active">🔌 Laden</button>
+      <button id="fitRouteBtn" class="mapPill">⊡ Route</button>
+    </div>
+    <div id="clickHint" class="mapHint hidden">Punkt auf der Karte wählen <button id="cancelPick">Abbrechen</button></div>
+  </main>
 
-    <section id="navOverlay" class="navOverlay hidden" aria-live="polite">
-      <div class="navInstruction">
-        <div id="navArrow" class="navArrow">↑</div>
-        <div><small id="navDistance">Start</small><strong id="navText">Navigation wird vorbereitet</strong></div>
-      </div>
-      <div class="navStats"><span id="navRemain">– km</span><span id="navEta">– min</span><span id="navSpeed">0 km/h</span></div>
-      <div class="navControls">
-        <button id="voiceBtn" class="navControl active">🔊 Stimme</button>
-        <button id="centerNavBtn" class="navControl">◎ Zentrieren</button>
-        <button id="stopNavBtn" class="navControl danger">■ Beenden</button>
-      </div>
-    </section>
+  <nav class="bottomNav" aria-label="Mobile Navigation">
+    <button data-panel="routePanel" class="active"><span>🚲</span><b>Navigation</b></button>
+    <button data-panel="discoverPanel"><span>🎯</span><b>Ausflüge</b></button>
+    <button data-panel="tourPanel"><span>🏕️</span><b>Touren</b></button>
+    <button data-panel="savedPanel"><span>⭐</span><b>Gespeichert</b></button>
+  </nav>
+</div>
 
-    <nav class="bottomNav">
-      <button data-panel="routePanel" class="active"><span>🚲</span>Route</button>
-      <button data-panel="discoverPanel"><span>🎯</span>Ausflüge</button>
-      <button data-panel="bikepackingPanel"><span>🏕️</span>Tour</button>
-      <button data-panel="savedPanel"><span>⭐</span>Gespeichert</button>
-    </nav>
-
-    <div id="toast" class="toast hidden"></div>
+<div id="navOverlay" class="navOverlay hidden">
+  <div class="navTop">
+    <button id="stopNavBtn" class="navRound">✕</button>
+    <div class="navInstruction">
+      <span id="navArrow">↑</span>
+      <div><b id="navDistance">–</b><strong id="navText">Navigation</strong></div>
+    </div>
+    <button id="voiceBtn" class="navRound active">🔊</button>
   </div>
-  <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
-  <script src="app.js"></script>
+  <div class="navMapMask"></div>
+  <div class="navBottom">
+    <div><strong id="navRemain">–</strong><small>Rest</small></div>
+    <div><strong id="navEta">–</strong><small>Zeit</small></div>
+    <div><strong id="navSpeed">0 km/h</strong><small>Tempo</small></div>
+    <button id="centerNavBtn">◎ Zentrieren</button>
+  </div>
+  <div id="offRouteBanner" class="offRoute hidden">Route verlassen – Neuberechnung läuft …</div>
+</div>
+
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modalCard">
+    <button class="modalClose" id="modalClose">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden" role="status"></div>
+
+<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
